@@ -1,0 +1,19 @@
+---
+- hosts: ansible-server
+  become: true
+
+  tasks:
+  - name: create docker image using war file
+    command: docker build -t sample-devops-image:latest .
+    args:
+      chdir: /opt/k8s-lab
+
+  - name: create tag to image
+    command: docker tag sample-devops-image yankils/sample-devops-image
+
+  - name: push image on to dockerhub
+    command: docker push yankils/sample-devops-image
+
+  - name: remove docker images form ansible server
+    command: docker rmi sample-devops-image:latest yankils/sample-devops-image
+    ignore_errors: yes

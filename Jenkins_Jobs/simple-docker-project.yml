@@ -1,0 +1,29 @@
+---
+- hosts: all
+  become: true
+  tasks:
+  - name: stop if we have old docker container
+    command: docker stop sample-devops-container
+    ignore_errors: yes
+
+  - name: remove stopped docker container
+    command: docker rm sample-devops-container
+    ignore_errors: yes
+
+  - name: remove current docker image
+    command: docker rmi sample-devops-image
+    ignore_errors: yes
+#    register: result
+#    failed_when:
+#      - result.rc == 0
+#      - '"docker" not in result.stdout'
+
+
+  - name: building docker image
+    command: docker build -t sample-devops-image .
+    args:
+      chdir: /opt/docker
+
+  - name: creating docker image
+    command: docker run -d --name sample-devops-container -p 8080:8080 sample-devops-image
+
